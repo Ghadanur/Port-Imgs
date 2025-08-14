@@ -1,0 +1,809 @@
+
+
+'use client'
+import React, { useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { Home, Phone, Sparkles, Mountain, Sun } from 'lucide-react';
+import { cn } from "@/lib/utils";
+
+type Theme = 'theme-nebula' | 'theme-carina-nebula' | 'theme-solar-system';
+
+const themes: { name: Theme, icon: React.FC<any> }[] = [
+    { name: 'theme-nebula', icon: Sparkles },
+    { name: 'theme-carina-nebula', icon: Mountain },
+    { name: 'theme-solar-system', icon: Sun },
+];
+
+const ThemeSwitcher = ({ activeTheme, setTheme }: { activeTheme: Theme, setTheme: (theme: Theme) => void }) => {
+    return (
+        <div className="fixed top-4 right-4 z-50 flex gap-2">
+            {themes.map((theme) => (
+                <button
+                    key={theme.name}
+                    onClick={() => setTheme(theme.name)}
+                    className={`p-2 rounded-full transition-all duration-300 ${
+                        activeTheme === theme.name 
+                            ? 'bg-white/30 text-teal-300 scale-110' 
+                            : 'bg-black/20 text-white/70 hover:bg-white/20'
+                    }`}
+                    aria-label={`Switch to ${theme.name} theme`}
+                >
+                    <theme.icon className="w-5 h-5" />
+                </button>
+            ))}
+        </div>
+    );
+};
+
+
+const sections = {
+  home: { title: 'Home', icon: '✨' },
+  about: { title: 'About', icon: '🎓' },
+  skills: { title: 'Skills', icon: '🛠️' },
+  experience: { title: 'Experience', icon: '🚀' },
+  projects: { title: 'Projects', icon: '💡' },
+  volunteering: { title: 'Volunteering', icon: '🤝' },
+  contact: { title: 'Contact', icon: '📧' },
+};
+
+const experienceData = [
+    {
+        date: 'Nov 2023 – Sep 2024',
+        title: 'Research Member - Formula Electric NED',
+        description: 'Conducted comprehensive research on E-Formula cars and SAE racing vehicles, focusing on technical design and performance optimization.',
+        position: { x: '25%', y: '15%' },
+        link: '#'
+    },
+    {
+        date: 'March 2024 – April 2024',
+        title: 'Electronics Intern - NESPAK',
+        description: 'Gained expertise in surveillance systems, fire alarm systems, and telecommunications. Explored engineering consultancy and reverse engineering methodologies.',
+        position: { x: '10%', y: '40%' },
+        link: '#'
+    },
+    {
+        date: 'March 2025 – April 2025',
+        title: 'Robotics Intern - NCAI Smart City Lab',
+        description: 'Restored and enhanced rover functionality for ROS-based autonomous systems. Developed control mechanisms and explored reinforcement learning applications in autonomous vehicles.',
+        position: { x: '30%', y: '65%' },
+        link: '#'
+    },
+    {
+        date: '2019 – 2021',
+        title: 'Freelance Voiceover Artist',
+        description: 'Completed several paid voiceover projects, delivering high-quality audio recordings for a range of media before starting university.',
+        position: { x: '70%', y: '35%' },
+        link: '#'
+    },
+    {
+        date: 'Nov 2023 - Sep 2024',
+        title: 'Social Media Director - ORYZOR NED Community',
+        description: 'Led social media strategy and content creation, managing promotional campaigns and enhancing community engagement through creative digital content.',
+        position: { x: '85%', y: '60%' },
+        link: '#'
+    },
+    {
+        date: '2022 – Present',
+        title: 'Freelance Social Media Manager & Video Editor',
+        description: 'Managed social media accounts and created engaging video content for various clients on a part-time basis while pursuing university studies.',
+        position: { x: '65%', y: '85%' },
+        link: '#'
+    }
+];
+
+const Experience = () => {
+    const [activeExperience, setActiveExperience] = React.useState<number | null>(null);
+    const handleStarClick = (index: number) => {
+        setActiveExperience(prev => (prev === index ? null : index));
+    };
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center experience-timeline">
+            <div className="relative w-full min-h-[16rem] flex items-center justify-center order-2 md:order-1">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeExperience ?? 'placeholder'}
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 30 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-full flex items-center justify-center"
+                    >
+                        {activeExperience !== null ? (
+                            <div className="timeline-info-card p-6 w-full max-w-md h-48 flex flex-col justify-center">
+                                <p className="text-xs text-gray-400 mb-2">{experienceData[activeExperience].date}</p>
+                                <h4
+                                    className="text-lg font-bold mb-3"
+                                    style={{
+                                        color: '#14b8a6',
+                                        textShadow: '0 0 8px rgba(20, 184, 166, 0.7)',
+                                    }}
+                                >
+                                    {experienceData[activeExperience].title}
+                                </h4>
+                                <p className="text-sm text-gray-300">{experienceData[activeExperience].description}</p>
+                            </div>
+                        ) : (
+                            <div className="text-center text-gray-400 w-full max-w-md px-4 h-48 flex flex-col justify-center">
+                                <p>Select a star to view details about my experience.</p>
+                            </div>
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+            <div className="celestial-timeline relative w-full order-1 md:order-2">
+                <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path
+                        d="M 25,15 L 10,40 L 30,65 M 10,40 L 70,35 M 30,65 L 85,60 M 70,35 L 65,85"
+                        stroke="rgba(100, 100, 200, 0.3)"
+                        strokeWidth="0.5"
+                        fill="transparent"
+                        className="timeline-path"
+                    />
+                </svg>
+                {experienceData.map((item, index) => (
+                    <div
+                        key={`exp-${index}`}
+                        className="timeline-point absolute"
+                        style={{ top: item.position.y, left: item.position.x, transform: 'translate(-50%, -50%)' }}
+                        onClick={() => handleStarClick(index)}
+                    >
+                        <AnimatePresence>
+                        {activeExperience === index && (
+                            <motion.div 
+                                className="absolute -top-8 left-1/2 -translate-x-1/2 text-center text-xs text-teal-300 w-max max-w-xs"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span>{item.title}</span>
+                                </div>
+                            </motion.div>
+                        )}
+                        </AnimatePresence>
+                        <svg className="timeline-star" width="20" height="20" viewBox="0 0 24 24" style={{ cursor: 'pointer' }}>
+                            <circle cx="12" cy="12" r="6" fill={activeExperience === index ? "#cd7f32" : "#14b8a6"} />
+                            <circle cx="12" cy="12" r="10" fill={activeExperience === index ? "rgba(205, 127, 50, 0.3)" : "rgba(20, 184, 166, 0.3)"} />
+                        </svg>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const SectionHeader = ({ title, onHomeClick, onContactClick }: { title: string, onHomeClick: () => void, onContactClick: () => void }) => (
+    <div className="flex items-center justify-between mb-12 relative w-full">
+        <button 
+            onClick={onHomeClick} 
+            className="group flex items-center gap-2 text-white hover:text-teal-400 transition-all duration-300"
+        >
+            <Home className="w-6 h-6 transition-transform duration-300 md:group-hover:scale-125 md:group-hover:drop-shadow-[0_0_5px_#14b8a6]" />
+            <span className="section-header-nav-label opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 md:-translate-x-4 md:group-hover:translate-x-0">Home</span>
+        </button>
+        
+        <h2 className="text-3xl font-bold text-center mx-4" style={{
+            background: 'linear-gradient(135deg, #ffffff, #14b8a6)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+        }}>
+            {title}
+        </h2>
+        
+        <button 
+            onClick={onContactClick} 
+            className="group flex items-center gap-2 text-white hover:text-yellow-400 transition-all duration-300"
+        >
+            <span className="section-header-nav-label opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 md:translate-x-4 md:group-hover:translate-x-0">Contact</span>
+            <Phone className="w-6 h-6 transition-transform duration-300 md:group-hover:scale-125 md:group-hover:drop-shadow-[0_0_5px_#cd7f32]" />
+        </button>
+    </div>
+);
+
+const heroTitles = [
+    "Electronics Engineer",
+    "Robotics Enthusiast",
+    "Innovation Driver",
+    "✨ Stargazer"
+];
+
+const DynamicHeroText = () => {
+    const [index, setIndex] = React.useState(0);
+
+    React.useEffect(() => {
+        const intervalId = setInterval(() => {
+            setIndex((prevIndex) => (prevIndex + 1) % heroTitles.length);
+        }, 2000); // Changes every 2 seconds
+
+        return () => clearInterval(intervalId);
+    }, []);
+
+    return (
+        <div className="inline-block">
+            <AnimatePresence mode="wait">
+                <motion.span
+                    key={heroTitles[index]}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5 }}
+                    className="hero-p stylish-hero-p"
+                >
+                    {heroTitles[index]}
+                </motion.span>
+            </AnimatePresence>
+        </div>
+    );
+};
+
+const aboutData = {
+    academic: {
+        title: 'Academic Excellence',
+        points: [
+            'Strong foundation in Electronics Engineering',
+            'Consistent high academic performance',
+            'Deep understanding of embedded systems',
+            'Advanced coursework in AI and machine learning',
+        ],
+    },
+    innovation: {
+        title: 'Innovation & Problem Solving',
+        points: [
+            'Recognized as a Galactic Problem Solver in NASA Challenge',
+            '2nd Position in Capture the Science competition',
+            'Runner up in CapTech innovation challenge',
+            'Creative approach to complex engineering problems',
+        ],
+    },
+    robotics: {
+        title: 'Hands-On Robotics',
+        points: [
+            'Expert in IoT and AI integration',
+            'Experience building autonomous systems',
+            'Proficient in sensor integration and control systems',
+            'Real-world application of theoretical knowledge',
+        ],
+    },
+    sustainability: {
+        title: 'Sustainability Focus',
+        points: [
+            'Passionate about environmental technology solutions',
+            'Focus on creating sustainable engineering practices',
+            'Green technology innovation mindset',
+            'Balancing technological advancement with environmental responsibility',
+        ],
+    },
+    photography: {
+        title: 'Photography Passion',
+        points: [
+            'Obsessed with capturing unique perspectives',
+            'Love exploring different angles and sceneries',
+            'Creative eye that enhances engineering design thinking',
+            <a href="https://www.flickr.com/photos/196616463@N02/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:text-teal-200">View my work on Flickr</a>,
+        ],
+    },
+};
+
+const starData = [
+    { id: 'academic', label: 'Academics', style: { top: '30%', left: '20%', animationDelay: '0s' } },
+    { id: 'innovation', label: 'Innovation', style: { top: '55%', left: '35%', animationDelay: '1s' } },
+    { id: 'robotics', label: 'Robotics', style: { top: '30%', left: '50%', animationDelay: '0.5s' } },
+    { id: 'sustainability', label: 'Sustainability', style: { top: '55%', left: '65%', animationDelay: '1.5s' } },
+    { id: 'photography', label: 'Photography', style: { top: '30%', left: '80%', animationDelay: '2s' } },
+];
+
+
+const SaturnAbout = () => {
+    const [activePanel, setActivePanel] = React.useState<string | null>(null);
+
+    const handleStarClick = (id: string) => {
+        setActivePanel(id);
+    };
+
+    const handleClose = () => {
+        setActivePanel(null);
+    };
+
+    React.useEffect(() => {
+        const handleEsc = (event: KeyboardEvent) => {
+           if (event.key === 'Escape') {
+              handleClose();
+           }
+        };
+        window.addEventListener('keydown', handleEsc);
+
+        return () => {
+            window.removeEventListener('keydown', handleEsc);
+        };
+    }, []);
+
+    return (
+        <div className="about-constellation-container">
+            <div className="relative w-full" style={{paddingTop: '60%'}}>
+            {starData.map((star) => (
+                <div
+                    key={star.id}
+                    className={`about-star-container ${activePanel === star.id ? 'active' : ''}`}
+                    style={star.style as React.CSSProperties}
+                    onClick={() => handleStarClick(star.id)}
+                >
+                    <div className="about-star"></div>
+                    <span className="about-star-label">{star.label}</span>
+                </div>
+            ))}
+            </div>
+
+            <AnimatePresence>
+                {activePanel && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="overlay"
+                            onClick={handleClose}
+                        />
+                        <motion.div
+                            key={activePanel}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="description-panel"
+                        >
+                            <button className="close-btn" onClick={handleClose}>&times;</button>
+                            <h3>{aboutData[activePanel as keyof typeof aboutData].title}</h3>
+                            <ul>
+                                {aboutData[activePanel as keyof typeof aboutData].points.map((point, index) => (
+                                    <motion.li
+                                        key={index}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: index * 0.1 }}
+                                    >
+                                        {point}
+                                    </motion.li>
+                                ))}
+                            </ul>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
+const ParallaxSection = ({ children, className, ...props }: { children: React.ReactNode, className?: string, id: string }) => {
+    const ref = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start end", "end start"]
+    });
+    const y = useTransform(scrollYProgress, [0, 1], ['-20%', '10%']);
+
+    return (
+        <section ref={ref} className={cn("section relative", className)} {...props}>
+            <motion.div style={{ y }}>
+                {children}
+            </motion.div>
+        </section>
+    );
+};
+
+
+export default function PortfolioPage() {
+    const [activeTheme, setActiveTheme] = React.useState<Theme>('theme-nebula');
+    
+    const handleSetTheme = (theme: Theme) => {
+        document.body.classList.remove('theme-nebula', 'theme-carina-nebula', 'theme-solar-system');
+        document.body.classList.add(theme);
+        setActiveTheme(theme);
+    };
+
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  React.useEffect(() => {
+    // Enhanced stargazer particles animation
+    function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        if (!particlesContainer) return;
+
+        // Clear existing particles
+        while(particlesContainer.firstChild) {
+            particlesContainer.removeChild(particlesContainer.firstChild);
+        }
+
+        const particleCount = 30;
+        
+        // Create twinkling stars
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            const size = Math.random() * 3 + 1;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+            
+            particlesContainer.appendChild(particle);
+        }
+
+        // Create shooting stars
+        for (let i = 0; i < 3; i++) {
+            const shootingStar = document.createElement('div');
+            shootingStar.className = 'shooting-star';
+            shootingStar.style.left = Math.random() * 100 + '%';
+            shootingStar.style.top = Math.random() * 50 + '%';
+            shootingStar.style.animationDelay = Math.random() * 10 + 's';
+            shootingStar.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            particlesContainer.appendChild(shootingStar);
+        }
+
+        // Create constellations
+        createConstellation(particlesContainer, 20, 20, 'orion');
+        createConstellation(particlesContainer, 70, 30, 'cassiopeia');
+        createConstellation(particlesContainer, 80, 70, 'ursa');
+
+        // Create nebula effects
+        const existingNebulas = document.querySelectorAll('.nebula');
+        existingNebulas.forEach(n => n.remove());
+        for (let i = 0; i < 2; i++) {
+            const nebula = document.createElement('div');
+            nebula.className = 'nebula';
+            nebula.style.left = Math.random() * 100 + '%';
+            nebula.style.top = Math.random() * 100 + '%';
+            nebula.style.animationDelay = i * 10 + 's';
+            document.body.appendChild(nebula);
+        }
+    }
+
+    function createConstellation(container: HTMLElement, x: number, y: number, type: string) {
+        if (!container) return;
+        const constellation = document.createElement('div');
+        constellation.className = 'constellation';
+        constellation.style.left = x + '%';
+        constellation.style.top = y + '%';
+
+        // Define constellation patterns
+        const patterns: { [key: string]: {x: number, y: number}[] } = {
+            orion: [
+                {x: 10, y: 10}, {x: 30, y: 5}, {x: 50, y: 15},
+                {x: 20, y: 35}, {x: 40, y: 30}, {x: 60, y: 40},
+                {x: 25, y: 55}, {x: 45, y: 50}, {x: 65, y: 60}
+            ],
+            cassiopeia: [
+                {x: 10, y: 30}, {x: 25, y: 10}, {x: 40, y: 20},
+                {x: 55, y: 5}, {x: 70, y: 25}
+            ],
+            ursa: [
+                {x: 10, y: 20}, {x: 25, y: 15}, {x: 40, y: 10},
+                {x: 55, y: 20}, {x: 45, y: 35}, {x: 30, y: 40},
+                {x: 15, y: 35}
+            ]
+        };
+
+        const starPattern = patterns[type];
+        if (!starPattern) return;
+        
+        // Create stars
+        starPattern.forEach((pos, index) => {
+            const star = document.createElement('div');
+            star.className = 'constellation-star';
+            star.style.left = pos.x + '%';
+            star.style.top = pos.y + '%';
+            star.style.animationDelay = index * 0.2 + 's';
+            constellation.appendChild(star);
+        });
+
+        // Create connecting lines
+        for (let i = 0; i < starPattern.length - 1; i++) {
+            const line = document.createElement('div');
+            line.className = 'constellation-line';
+            const start = starPattern[i];
+            const end = starPattern[i + 1];
+            
+            const length = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+            const angle = Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
+            
+            line.style.left = start.x + '%';
+            line.style.top = start.y + '%';
+            line.style.width = length + '%';
+            line.style.transform = `rotate(${angle}deg)`;
+            line.style.animationDelay = i * 0.5 + 's';
+            
+            constellation.appendChild(line);
+        }
+
+        container.appendChild(constellation);
+    }
+    
+    // Initialize all features
+    createParticles();
+    
+    const intervalId = setInterval(() => {
+      const tags = document.querySelectorAll('.tag');
+      tags.forEach(tag => {
+          if (Math.random() > 0.95) {
+              (tag as HTMLElement).style.background = 'linear-gradient(135deg, #cd7f32, #14b8a6)';
+              setTimeout(() => {
+                  (tag as HTMLElement).style.background = 'linear-gradient(135deg, #14b8a6, #0d9488)';
+              }, 1000);
+          }
+      });
+    }, 3000);
+
+    return () => {
+        clearInterval(intervalId);
+    };
+
+  }, []);
+
+  const numStars = Object.keys(sections).length;
+  const radius = 40; // a percentage
+  const starPositions = Array.from({ length: numStars }).map((_, index) => {
+    const angle = (index / numStars) * 2 * Math.PI - Math.PI / 2; // Start from top
+    const left = 50 + radius * Math.cos(angle);
+    const top = 50 + radius * Math.sin(angle);
+    return { top: `${top}%`, left: `${left}%` };
+  });
+
+
+  return (
+    <>
+      <ThemeSwitcher activeTheme={activeTheme} setTheme={handleSetTheme} />
+      <div className="floating-particles" id="particles"></div>
+      
+      <main className="container relative z-10 mx-auto">
+        <section id="home" className="flex h-screen flex-col items-center justify-center pt-20">
+            <div className="w-full max-w-4xl text-center">
+              <h1 className="hero-h1 stylish-hero-h1 font-display">Ghada Noor</h1>
+              <div className="h-8">
+                <DynamicHeroText />
+              </div>
+              <p className="hero-p stylish-hero-p-secondary">Passionate about creating technology-driven solutions while contemplating the cosmos</p>
+              
+              <div className="constellation-nav relative mx-auto my-12 flex items-center justify-center" style={{ width: 'clamp(18rem, 80vw, 24rem)', height: 'clamp(18rem, 80vw, 24rem)' }}>
+                {Object.keys(sections).map((key, index) => (
+                  <button
+                    key={key}
+                    onClick={() => scrollToSection(key)}
+                    className="star-nav-item absolute -translate-x-1/2 -translate-y-1/2 transform"
+                    style={starPositions[index]}
+                  >
+                    <div className="star-nav-point"></div>
+                    <span className="star-nav-label">{sections[key as keyof typeof sections].title}</span>
+                  </button>
+                ))}
+                 <p className="constellation-prompt text-center w-3/4">Click a star to explore a section</p>
+              </div>
+            </div>
+        </section>
+
+        <ParallaxSection className="w-full" id="about">
+            <div className="container">
+                <SectionHeader title="About Me" onHomeClick={() => scrollToSection('home')} onContactClick={() => scrollToSection('contact')} />
+                <SaturnAbout />
+            </div>
+        </ParallaxSection>
+
+        <ParallaxSection className="w-full" id="skills">
+            <div className="container">
+                <SectionHeader title="Technical Expertise" onHomeClick={() => scrollToSection('home')} onContactClick={() => scrollToSection('contact')} />
+                <div className="skills-grid">
+                    <div className="skill-card">
+                        <h3>Programming & Development</h3>
+                        <p>Proficient in multiple programming languages for embedded and software development</p>
+                        <div className="skill-tags">
+                            <span className="tag">Python</span>
+                            <span className="tag">Verilog</span>
+                            <span className="tag">C</span>
+                            <span className="tag">Assembly</span>
+                            <span className="tag">Ladder Logic</span>
+                        </div>
+                    </div>
+                    
+                    <div className="skill-card">
+                        <h3>Hardware & Microcontrollers</h3>
+                        <p>Hands-on experience with various microcontrollers and embedded systems</p>
+                        <div className="skill-tags">
+                            <span className="tag">Arduino</span>
+                            <span className="tag">ESP-32</span>
+                            <span className="tag">Jetson Nano</span>
+                            <span className="tag">Siemens PLC</span>
+                            <span className="tag">8086</span>
+                        </div>
+                    </div>
+                    
+                    <div className="skill-card">
+                        <h3>Simulation & Design</h3>
+                        <p>Expert in simulation tools and circuit design for complex engineering projects</p>
+                        <div className="skill-tags">
+                            <span className="tag">MATLAB</span>
+                            <span className="tag">Simulink</span>
+                            <span className="tag">ROS</span>
+                            <span className="tag">Gazebo</span>
+                            <span className="tag">Proteus</span>
+                        </div>
+                    </div>
+                    
+                    <div className="skill-card">
+                        <h3>Specialized Technologies</h3>
+                        <p>Advanced knowledge in robotics, AI, and IoT development</p>
+                        <div className="skill-tags">
+                            <span className="tag">Robotics</span>
+                            <span className="tag">AI/ML</span>
+                            <span className="tag">IoT</span>
+                            <span className="tag">PCB Design</span>
+                            <span className="tag">Signal Processing</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ParallaxSection>
+
+        <ParallaxSection className="w-full" id="experience">
+            <div className="container">
+                <SectionHeader title="Professional Journey" onHomeClick={() => scrollToSection('home')} onContactClick={() => scrollToSection('contact')} />
+                <Experience />
+            </div>
+        </ParallaxSection>
+
+        <ParallaxSection className="w-full" id="projects">
+            <div className="container">
+                <SectionHeader title="Featured Projects" onHomeClick={() => scrollToSection('home')} onContactClick={() => scrollToSection('contact')} />
+                <div className="projects-grid">
+                    <div className="project-card">
+                        <img src="https://raw.githubusercontent.com/Ghadanur/Port-Imgs/7cb9eeed517c40defbd11c4e48f139eeb097d729/Images/Portable_Q_A.jpg" alt="Air Quality Monitoring System" className="rounded-t-lg project-image" data-ai-hint="air quality" />
+                        <div className="p-6">
+                            <h3>Air Quality Monitoring System</h3>
+                            <p>Final Year Design Project featuring GSM integration for real-time data transmission, sensor calibration, and comprehensive web/mobile dashboard development for environmental monitoring.</p>
+                        </div>
+                    </div>
+                    
+                    <div className="project-card">
+                        <img src="https://placehold.co/600x400.png" alt="Differential Drive Robot" className="rounded-t-lg project-image" data-ai-hint="robot rover" />
+                        <div className="p-6">
+                            <h3>Differential Drive Robot</h3>
+                            <p>Designed and simulated an autonomous rover using ROS framework with advanced visualization in RViz and Gazebo simulation environments.</p>
+                        </div>
+                    </div>
+                    
+                    <div className="project-card">
+                        <img src="https://raw.githubusercontent.com/Ghadanur/Port-Imgs/a6e24e31aabab87809cf86af9dc97c9ec1dcb44a/Images/SR_ARQ.jpg" alt="ARQ Protocol Implementation" className="rounded-t-lg project-image" data-ai-hint="network protocol" />
+                        <div className="p-6">
+                            <h3>ARQ Protocol Implementation</h3>
+                            <p>Developed Selective Repeat Sliding Window ARQ mechanism using OMNeT++ with custom MAC layer protocol and traffic generation capabilities.</p>
+                        </div>
+                    </div>
+                    
+                    <div className="project-card">
+                        <img src="https://raw.githubusercontent.com/Ghadanur/Port-Imgs/a7687e230649e4bb2d3a529de1dacf2c37b7aeb5/Images/Temp_dry_PLC_Logic.jpg" alt="PLC Temperature Control" className="rounded-t-lg project-image" data-ai-hint="industrial temperature" />
+                        <div className="p-6">
+                            <h3>PLC Temperature Control</h3>
+                            <p>Industrial automation system using Siemens PLC and ladder logic for precise temperature regulation with integrated sensors and actuators.</p>
+                        </div>
+                    </div>
+                    
+                    <div className="project-card">
+                        <img src="https://raw.githubusercontent.com/Ghadanur/Port-Imgs/500cc74a0ad99b0f5fc23adc9a071099cd5bc4a4/Images/imag_class_project.jpg" alt="AI Image Classifier" className="rounded-t-lg project-image" data-ai-hint="ai flower" />
+                        <div className="p-6">
+                            <h3>AI Image Classifier</h3>
+                            <p>Command-line application implementing neural networks trained on the 102 Category Flower Dataset for accurate image classification.</p>
+                        </div>
+                    </div>
+                    
+                    <div className="project-card">
+                        <img src="https://placehold.co/600x400.png" alt="Smart Parking System" className="rounded-t-lg project-image" data-ai-hint="smart parking" />
+                        <div className="p-6">
+                            <h3>Smart Parking System</h3>
+                            <p>IoT-based solution using Node MCU and ultrasonic sensors for real-time parking space monitoring and wireless data transmission.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ParallaxSection>
+
+        <ParallaxSection className="w-full" id="volunteering">
+            <div className="container">
+                <SectionHeader title="Volunteering" onHomeClick={() => scrollToSection('home')} onContactClick={() => scrollToSection('contact')} />
+                <div className="experience-timeline">
+                    <div className="timeline-item">
+                        <p className="timeline-date">Social Services</p>
+                        <h3 className="timeline-title">Student Volunteer - Dar ul Sukun</h3>
+                    </div>
+                    <div className="timeline-item">
+                        <p className="timeline-date">Dec 2022</p>
+                        <h3 className="timeline-title">Student Volunteer - 3rd Int'l Conference of Innovation in CS & SE</h3>
+                        <p>Science and Technology</p>
+                    </div>
+                     <div className="timeline-item">
+                        <h3 className="timeline-title">Social Media Ambassador - IEEE SB Envision '22</h3>
+                        <p>Technology Event in 2022 At NED University</p>
+                    </div>
+                     <div className="timeline-item">
+                        <p className="timeline-date">Dec 2021 - Mar 2022</p>
+                        <h3 className="timeline-title">Active Team member - NED Entrepreneurship Society</h3>
+                         <p>Science and Technology</p>
+                    </div>
+                    <div className="timeline-item">
+                        <p className="timeline-date">Dec 2021 - Nov 2023</p>
+                        <h3 className="timeline-title">Active Team Member - IEEE NEDUET Student Branch</h3>
+                        <p>Economic Empowerment</p>
+                    </div>
+                </div>
+            </div>
+        </ParallaxSection>
+
+        <ParallaxSection className="w-full" id="contact">
+            <div className="container">
+                <SectionHeader title="Let's Connect" onHomeClick={() => scrollToSection('home')} onContactClick={() => scrollToSection('contact')} />
+                <div style={{textAlign: 'center', maxWidth: '800px', margin: '0 auto 40px'}}>
+                    <p style={{fontSize: '1.1rem', lineHeight: 1.8, opacity: 0.9}}>
+                      I'm always excited to connect with fellow innovators, creators, and problem-solvers. Whether you have a project in mind, a question about my work, or just want to say hello, please don't hesitate to reach out.
+                    </p>
+                </div>
+                <div className="contact-info">
+                    <div className="contact-card">
+                        <div className="contact-icon">📧</div>
+                        <h4>Email</h4>
+                        <p>ghadanoor.el@gmail.com</p>
+                    </div>
+                    
+                    <div className="contact-card">
+                        <div className="contact-icon">📱</div>
+                        <h4>Phone</h4>
+                        <p>+92-334-0273197</p>
+                    </div>
+                    
+                    <div className="contact-card">
+                        <div className="contact-icon">📍</div>
+                        <h4>Location</h4>
+                        <p>Karachi, Pakistan</p>
+                    </div>
+                    
+                    <a href="https://www.linkedin.com/in/ghada-noor-141aa4228" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                      <div className="contact-card">
+                          <div className="contact-icon">💼</div>
+                          <h4>LinkedIn</h4>
+                          <p>Professional Profile</p>
+                      </div>
+                    </a>
+
+                    <a href="https://www.flickr.com/photos/196616463@N02/" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                      <div className="contact-card">
+                          <div className="contact-icon">📷</div>
+                          <h4>Flickr</h4>
+                          <p>My Photography</p>
+                      </div>
+                    </a>
+
+                    <a href="https://github.com/Ghadanur" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+                      <div className="contact-card">
+                          <div className="contact-icon">💻</div>
+                          <h4>GitHub</h4>
+                          <p>My Projects</p>
+                      </div>
+                    </a>
+                </div>
+            </div>
+        </ParallaxSection>
+
+      </main>
+
+      <footer className="footer">
+          <div className="container">
+              <p>&copy; 2025 Ghada Noor. Crafted with passion for innovation and sustainability.</p>
+          </div>
+      </footer>
+    </>
+  );
+}
