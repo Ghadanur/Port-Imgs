@@ -1,0 +1,1315 @@
+'use client';
+
+import React, { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Rocket, Binary, Orbit, Atom, Bot, TestTube, Milestone, Building2 } from 'lucide-react';
+
+const CosmicJourney = () => {
+    const journeyRef = useRef(null);
+    const hasAnimated = useRef(false);
+
+    useEffect(() => {
+        if (hasAnimated.current) return;
+        
+        gsap.registerPlugin(ScrollTrigger);
+
+        const journeyElement = journeyRef.current;
+        if (!journeyElement) return;
+
+        // Generate stars
+        const starsContainer = journeyElement.querySelector('.stars-container');
+        if (starsContainer) {
+            const starCount = 150;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'particle';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                star.style.transform = `scale(${Math.random() * 1.5 + 0.5})`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        const journeyContent = document.querySelector(".cosmic-journey-content") as HTMLElement;
+
+        const spacecraftTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: journeyContent,
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1.5,
+                onUpdate: (self) => {
+                    gsap.to(".progress-bar", {
+                        scaleX: self.progress,
+                        duration: 0.1
+                    });
+                }
+            }
+        });
+        
+        // Pin the spacecraft and animate its journey
+        spacecraftTl
+            .fromTo(".spacecraft", 
+                { 
+                    top: "50%", 
+                    left: () => -journeyContent.offsetWidth * 0.2, // Start off-screen left
+                    autoAlpha: 0 
+                },
+                { 
+                    left: "10%", 
+                    autoAlpha: 1,
+                    duration: 10, 
+                    ease: "power1.inOut" 
+                }
+            )
+            .to(".spacecraft", {
+                 y: () => journeyContent.offsetHeight - window.innerHeight/2,
+                 ease: "none"
+            }, 0)
+            .to(".spacecraft", { 
+                left: () => journeyContent.offsetWidth + 200, // End off-screen right
+                duration: 10, 
+                ease: "power1.in" 
+            }, ">-10");
+
+
+        gsap.utils.toArray<HTMLElement>('.cosmic-journey-station').forEach((station, index) => {
+            const stationInfo = station.querySelector('.station-info');
+            gsap.fromTo(stationInfo,
+                { opacity: 0, x: -100 },
+                {
+                    opacity: 1, x: 0, duration: 1,
+                    scrollTrigger: {
+                        trigger: station,
+                        start: "top center",
+                        end: "center center",
+                        toggleActions: "play reverse play reverse"
+                    }
+                }
+            );
+
+            // Make rocket seem to interact with station
+            ScrollTrigger.create({
+                trigger: station,
+                start: 'top center',
+                end: 'bottom center',
+                onEnter: () => gsap.to('.spacecraft .exhaust', { scaleX: 0.5, opacity: 0.6, duration: 0.3 }),
+                onLeaveBack: () => gsap.to('.spacecraft .exhaust', { scaleX: 0.5, opacity: 0.6, duration: 0.3 }),
+                onEnterBack: () => gsap.to('.spacecraft .exhaust', { scaleX: 1, opacity: 0.8, duration: 0.3 }),
+                onLeave: () => gsap.to('.spacecraft .exhaust', { scaleX: 1, opacity: 0.8, duration: 0.3 }),
+            });
+        });
+
+        hasAnimated.current = true;
+        
+        return () => {
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        };
+    }, []);
+
+    const experiences = [
+      {
+        icon: Rocket,
+        title: 'Research Member - Formula Electric NED',
+        description: 'Conducted comprehensive research on E-Formula cars and SAE racing vehicles, focusing on technical design and performance optimization.'
+      },
+      {
+        icon: Building2,
+        title: 'Electronics Intern - NESPAK',
+        description: 'Gained expertise in surveillance systems, fire alarm systems, and telecommunications. Explored engineering consultancy and reverse engineering.'
+      },
+      {
+        icon: Bot,
+        title: 'Robotics Intern - NCAI Smart City Lab',
+        description: 'Restored and enhanced rover functionality for ROS-based autonomous systems. Developed control mechanisms and explored reinforcement learning.'
+      },
+      {
+        icon: TestTube,
+        title: 'Freelance Voiceover Artist',
+        description: 'Completed several paid voiceover projects, delivering high-quality audio recordings for a range of media before starting university.'
+      },
+      {
+        icon: Atom,
+        title: 'Social Media Director - ORYZOR NED',
+        description: 'Led social media strategy and content creation, managing promotional campaigns and enhancing community engagement through creative digital content.'
+      },
+      {
+        icon: Milestone,
+        title: 'Freelance Social Media Manager',
+        description: 'Managed social media accounts and created engaging video content for various clients on a part-time basis while pursuing university studies.'
+      },
+    ]
+
+    return (
+        <div ref={journeyRef}>
+            <div className="progress-bar"></div>
+            <div className="space-scene">
+                <div className="stars-container"></div>
+                <div className="spacecraft">
+                     <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 0 L65 25 L60 25 L60 55 L75 75 L75 95 L65 100 L35 100 L25 95 L25 75 L40 55 L40 25 L35 25 Z" fill="#e0e0e0"/>
+                        <path d="M50 0 L55 25 L45 25 Z" fill="#a0a0a0"/>
+                        <path d="M60 55 L70 70 L75 75 L75 95 L70 98 L65 100 L60 95 Z" fill="#c0c0c0"/>
+                        <path d="M40 55 L30 70 L25 75 L25 95 L30 98 L35 100 L40 95 Z" fill="#c0c0c0"/>
+                        <circle cx="50" cy="40" r="8" fill="#14b8a6" stroke="#0d9488" strokeWidth="2"/>
+                    </svg>
+                    <div className="exhaust"></div>
+                </div>
+            </div>
+            
+            <div className="cosmic-journey-content">
+                <section className="cosmic-journey-section h-[100vh] flex items-center justify-center">
+                     <div className="text-center">
+                        <h2 className="text-3xl md:text-5xl font-bold">My Professional Journey</h2>
+                        <p className="max-w-2xl mx-auto mt-4 text-lg">Embark on a voyage through my experiences, from academic research to hands-on industry internships. Scroll down to launch.</p>
+                     </div>
+                </section>
+
+                {experiences.map((exp, index) => {
+                  const Icon = exp.icon;
+                  return (
+                    <section key={index} className="cosmic-journey-station">
+                        <div className="station-info">
+                            <span className="station-icon"><Icon /></span>
+                            <h3 className="text-xl font-bold text-teal-300 mb-2">{exp.title}</h3>
+                            <p className="text-gray-400">{exp.description}</p>
+                        </div>
+                    </section>
+                  )
+                })}
+                
+                <section className="cosmic-journey-section h-[100vh] flex items-center justify-center">
+                    <div className="cosmic-info text-center">
+                        <h2 className="text-2xl md:text-4xl">The Infinite Beyond</h2>
+                        <p>This journey through past experiences is just the beginning. I am constantly seeking new challenges and opportunities to learn, grow, and contribute to the future of technology.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    );
+};
+
+export default CosmicJourney;
+
+<!--global.css-->
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    scroll-behavior: smooth;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    color: #fff;
+    position: relative;
+    transition: background 1.5s ease-in-out;
+    background: #0f0f23;
+    overflow-x: hidden;
+}
+
+/* Default Theme: Nebula (original) */
+.theme-nebula {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.9) 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.8) 1px, transparent 1px),
+        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.7) 1px, transparent 1px),
+        radial-gradient(circle at 60% 70%, rgba(20, 184, 166, 0.8) 2px, transparent 2px),
+        radial-gradient(circle at 30% 10%, rgba(205, 127, 50, 0.6) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 90% 60%, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+        radial-gradient(circle at 15% 30%, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+        radial-gradient(circle at 75% 85%, rgba(20, 184, 166, 0.4) 1px, transparent 1px),
+        linear-gradient(-45deg, #0f0f23, #1a1a2e, #16213e, #0f3460);
+    background-size: 
+        200px 200px,
+        300px 300px,
+        250px 250px,
+        400px 400px,
+        350px 350px,
+        180px 180px,
+        220px 220px,
+        320px 320px,
+        400% 400%;
+    animation: starfield 60s linear infinite, gradientShift 20s ease infinite;
+}
+
+/* Carina Nebula Theme */
+.theme-carina-nebula {
+    background:
+        radial-gradient(ellipse at 80% 20%, rgba(255, 220, 185, 0.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 80%, rgba(255, 170, 120, 0.3) 0%, transparent 40%),
+        linear-gradient(140deg, #1a0802 10%, #4f180b 40%, #a43a1a 70%, #d46f33 100%);
+    background-attachment: fixed;
+}
+
+
+/* Solar System Theme */
+.theme-solar-system {
+    background: #000;
+    background-image: 
+        radial-gradient(circle at 10% 10%, #fffde7 1px, transparent 1px),
+        radial-gradient(circle at 50% 90%, #ffe0b2 1px, transparent 1px),
+        radial-gradient(circle at 90% 20%, #ffccbc 1px, transparent 1px),
+        radial-gradient(circle at 30% 70%, #d1c4e9 1px, transparent 1px);
+    background-size: 500px 500px;
+    animation: starfield-solar 120s linear infinite;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at center, transparent 30%, rgba(15, 15, 35, 0.1) 70%),
+        radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 3%),
+        radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.08) 0%, transparent 2%),
+        radial-gradient(circle at 70% 90%, rgba(20, 184, 166, 0.15) 0%, transparent 4%),
+        radial-gradient(circle at 30% 80%, rgba(205, 127, 50, 0.1) 0%, transparent 3%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes starfield {
+    0% { background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0% 50%; }
+    100% { background-position: 200px 200px, -300px 300px, 250px -250px, -400px 400px, 350px -350px, -180px 180px, 220px -220px, -320px 320px, 0% 50%; }
+}
+
+@keyframes starfield-solar {
+    from { background-position: 0 0; }
+    to { background-position: -10000px 5000px; }
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    25% { background-position: 50px 50px, 75px -75px, -50px 100px, 100px -100px, -75px 125px, 30px -60px, -40px 80px, 60px -120px, 25% 75%; }
+    50% { background-position: 100px 100px, 150px -150px, -100px 200px, 200px -200px, -150px 250px, 60px -120px, -80px 160px, 120px -240px, 100% 50%; }
+    75% { background-position: 150px 150px, 225px -225px, -150px 300px, 300px -300px, -225px 375px, 90px -180px, -120px 240px, 180px -360px, 75% 25%; }
+    100% { background-position: 200px 200px, 300px -300px, -200px 400px, 400px -400px, -300px 500px, 120px -240px, -160px 320px, 240px -480px, 0% 50%; }
+}
+
+.floating-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.particle {
+    position: absolute;
+    background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(20,184,166,0.3));
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite, twinkle 3s ease-in-out infinite;
+}
+
+.shooting-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: linear-gradient(45deg, #ffffff, #14b8a6);
+    border-radius: 50%;
+    animation: shootingStar 4s linear infinite;
+}
+
+.shooting-star::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.8), transparent);
+    transform: translateX(-30px) rotate(-45deg);
+}
+
+.constellation {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    opacity: 0.6;
+    animation: constellationGlow 8s ease-in-out infinite;
+}
+
+.constellation-star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255,255,255,0.8);
+}
+
+.constellation-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(20,184,166,0.3));
+    transform-origin: left center;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+    50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes shootingStar {
+    0% {
+        opacity: 0;
+        transform: translateX(-100px) translateY(100px);
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(100vw) translateY(-100px);
+    }
+}
+
+@keyframes constellationGlow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
+.nebula {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(ellipse, rgba(20,184,166,0.1), rgba(205,127,50,0.05), transparent);
+    border-radius: 50%;
+    filter: blur(40px);
+    animation: nebulaFloat 20s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+@keyframes nebulaFloat {
+    0%, 100% { 
+        transform: translate(0px, 0px) scale(1);
+        opacity: 0.1;
+    }
+    25% { 
+        transform: translate(50px, -30px) scale(1.1);
+        opacity: 0.15;
+    }
+    50% { 
+        transform: translate(-30px, 50px) scale(0.9);
+        opacity: 0.2;
+    }
+    75% { 
+        transform: translate(40px, 20px) scale(1.05);
+        opacity: 0.12;
+    }
+}
+
+.hero h1.hero-h1 {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff, #14b8a6, #cd7f32);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textShimmer 3s ease-in-out infinite;
+}
+
+.stylish-hero-h1 {
+    font-size: clamp(2.5rem, 10vw, 5.5rem);
+    margin-bottom: 20px;
+    font-weight: 900;
+    background: linear-gradient(45deg, #f0f0f0, #14b8a6, #cd7f32, #f0f0f0);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textShimmer 4s ease-in-out infinite;
+}
+
+@keyframes textShimmer {
+    0% { background-position: 0% 50%; filter: brightness(1); }
+    50% { background-position: 100% 50%; filter: brightness(1.3); }
+    100% { background-position: 0% 50%; filter: brightness(1); }
+}
+
+.hero p.hero-p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    animation: fadeInUp 1s ease 0.5s both;
+}
+
+.stylish-hero-p {
+    font-size: clamp(1rem, 4vw, 1.4rem);
+    font-weight: 300;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    animation: fadeInUp 1s ease 0.5s both;
+}
+
+.stylish-hero-p-secondary {
+    font-size: clamp(0.9rem, 3vw, 1.2rem);
+    font-style: italic;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+    animation: fadeInUp 1s ease 0.8s both;
+}
+
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+.section {
+    padding: clamp(120px, 20vh, 180px) 0;
+    position: relative;
+    width: 100%;
+}
+
+.section h2 {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    text-align: center;
+    margin-bottom: 50px;
+    background: linear-gradient(135deg, #ffffff, #14b8a6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.skill-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.skill-card:hover {
+    transform: translateY(-10px) rotateY(5deg);
+    box-shadow: 0 20px 40px rgba(20, 184, 166, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.skill-card h3 {
+    color: #14b8a6;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.tag {
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.tag:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(20, 184, 166, 0.4);
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.project-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    transition: all 0.4s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.7s ease;
+}
+
+.project-card:hover::before {
+    left: 100%;
+}
+
+.project-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(20, 184, 166, 0.3);
+}
+
+.project-image {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.project-card h3 {
+    color: #cd7f32;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.contact-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.contact-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.contact-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.contact-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #14b8a6, #cd7f32);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.footer {
+    text-align: center;
+    padding: 40px 0;
+    background: rgba(45, 55, 72, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+    #home {
+        justify-content: center;
+        align-items: center;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    
+    .stylish-hero-h1 {
+        font-size: clamp(2.5rem, 15vw, 3.5rem);
+    }
+    
+    .stylish-hero-p {
+        font-size: clamp(1rem, 5vw, 1.2rem);
+    }
+    
+    .stylish-hero-p-secondary {
+        font-size: clamp(0.9rem, 4vw, 1.1rem);
+    }
+
+    .section {
+        padding: clamp(120px, 25vh, 180px) 0;
+    }
+    
+    .section h2 {
+        font-size: clamp(2rem, 10vw, 2.5rem);
+    }
+
+    .constellation-nav {
+      width: clamp(18rem, 80vw, 24rem);
+      height: clamp(18rem, 80vw, 24rem);
+      max-width: 100%;
+    }
+
+    .skills-grid,
+    .projects-grid,
+    .contact-info,
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .experience-timeline {
+        grid-template-columns: 1fr;
+    }
+
+    .experience-timeline .order-1 {
+        order: 1;
+    }
+    .experience-timeline .order-2 {
+        order: 2;
+    }
+
+    .section-header-nav-label {
+        display: none;
+    }
+
+    .celestial-timeline {
+      height: 24rem; /* h-96 */
+    }
+
+    .about-constellation-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .about-constellation-container .description-panel {
+        width: 95%;
+        padding: 20px;
+    }
+}
+
+.experience-timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline-item {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 30px 0;
+    border-left: 4px solid #14b8a6;
+    transition: all 0.3s ease;
+}
+
+.timeline-item:hover {
+    transform: translateX(10px);
+    box-shadow: 0 15px 30px rgba(20, 184, 166, 0.3);
+}
+
+.timeline-date {
+    color: #cd7f32;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.timeline-title {
+    color: #14b8a6;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+}
+
+.achievement-badge {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(205, 127, 50, 0.2));
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.achievement-badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 30px rgba(20, 184, 166, 0.4);
+}
+
+.achievement-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #14b8a6, #cd7f32);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+/* Constellation Navigation */
+.constellation-nav {
+  /* Adjust size as needed */
+}
+
+.star-nav-item {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.star-nav-item:hover {
+  transform: scale(1.2) translate(-50%, -50%);
+  color: #14b8a6;
+}
+
+.star-nav-point {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.8), 0 0 20px 6px rgba(20, 184, 166, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.star-nav-item:hover .star-nav-point {
+  box-shadow: 0 0 16px 4px rgba(255, 255, 255, 1), 0 0 30px 8px rgba(20, 184, 166, 0.7);
+}
+
+
+.star-nav-label {
+  margin-top: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-shadow: 0 0 5px rgba(20, 184, 166, 0.8);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.star-nav-item:hover .star-nav-label {
+  opacity: 1;
+}
+
+/* Celestial Timeline */
+.celestial-timeline {
+  position: relative;
+  width: 100%;
+  height: clamp(24rem, 60vh, 30rem);
+  margin-top: 50px;
+}
+
+.timeline-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawPath 10s ease-in-out forwards;
+}
+
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.timeline-point {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.timeline-point:hover .timeline-star {
+  transform: scale(1.5);
+  filter: drop-shadow(0 0 10px #14b8a6);
+}
+
+.timeline-point:hover .timeline-label {
+  opacity: 1;
+  transform: translateY(-5px);
+}
+
+.timeline-star {
+  transition: all 0.3s ease;
+}
+
+.timeline-label {
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.timeline-info-card {
+  position: absolute;
+  background: rgba(26, 26, 46, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  width: 280px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 10;
+}
+
+.constellation-prompt {
+    font-size: clamp(0.8rem, 1vw, 1rem);
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 0 0 8px rgba(20, 184, 166, 0.5);
+    animation: pulse-text 4s ease-in-out infinite;
+}
+
+@keyframes pulse-text {
+    0%, 100% {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+/* About Me Constellation Section */
+.about-constellation-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.about-star-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: float-heading 3s ease-in-out infinite;
+    z-index: 3;
+    transform: translate(-50%, -50%);
+}
+
+.about-star {
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(ellipse at center, #ffffff 0%, #14b8a6 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 15px 5px rgba(20, 184, 166, 0.5), 0 0 25px 10px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.about-star-label {
+    margin-top: 10px;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
+    transition: all 0.3s ease;
+}
+
+.about-star-container:hover .about-star {
+    transform: scale(1.5);
+    box-shadow: 0 0 25px 8px rgba(20, 184, 166, 0.7), 0 0 40px 15px rgba(255, 255, 255, 0.5);
+}
+
+.about-star-container:hover .about-star-label {
+    color: #14b8a6;
+    transform: translateY(5px);
+}
+
+.about-star-container.active .about-star {
+    transform: scale(1.5);
+    box-shadow: 0 0 25px 8px rgba(205, 127, 50, 0.7), 0 0 40px 15px rgba(255, 255, 255, 0.5);
+    background: radial-gradient(ellipse at center, #ffffff 0%, #cd7f32 100%);
+}
+
+@keyframes float-heading {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+    50% { transform: translate(-50%, -50%) translateY(-10px); }
+}
+
+.description-panel {
+    position: relative;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(20, 184, 166, 0.3);
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    z-index: 50;
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease-out;
+}
+
+.description-panel:hover {
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+}
+
+.description-panel h3 {
+    color: #14b8a6;
+    margin-bottom: 20px;
+    font-size: 28px;
+    text-align: center;
+}
+
+.description-panel ul {
+    list-style: none;
+    padding: 0;
+}
+
+.description-panel li {
+    margin: 15px 0;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 3px solid #14b8a6;
+    font-size: 1.1rem;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #14b8a6;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    transform: scale(1.2);
+    color: #cd7f32;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 40;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* New styles for Description Constellation */
+.desc-constellation-star {
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 12px 4px rgba(255, 255, 255, 0.9), 0 0 20px 8px rgba(20, 184, 166, 0.6);
+}
+
+.desc-constellation-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-shadow: 0 0 8px rgba(20, 184, 166, 0.7);
+}
+
+.particle-burst {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff, rgba(20, 184, 166, 0.5));
+    pointer-events: none;
+    z-index: 100;
+}
+    
+
+/* Hologram styles */
+@keyframes hologramFloat {
+    0% { transform: translateY(0) rotateZ(0deg); }
+    50% { transform: translateY(-15px) rotateZ(5deg); }
+    100% { transform: translateY(0) rotateZ(0deg); }
+}
+
+@keyframes hologramFlicker {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.8; }
+}
+
+.hologram-container {
+    position: relative;
+    width: 350px;
+    height: 400px;
+    transform-style: preserve-3d;
+    animation: hologramFloat 8s ease-in-out infinite;
+}
+
+.hologram-projection {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(20, 184, 166, 0.25) 0%, rgba(20, 184, 166, 0.1) 50%, transparent 70%);
+    border-radius: 15px;
+    border-top: 1px solid rgba(20, 184, 166, 0.5);
+    color: rgba(0, 255, 255, 0.8);
+    text-shadow: 0 0 8px rgba(20, 184, 166, 0.7);
+    animation: hologramFlicker 3s infinite;
+}
+
+.hologram-projection h3 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.hologram-projection ul {
+    list-style: none;
+    padding: 0;
+}
+.hologram-projection li {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    padding-left: 1.2rem;
+    position: relative;
+}
+.hologram-projection li::before {
+    content: '⬢';
+    position: absolute;
+    left: 0;
+    font-size: 0.8rem;
+    color: #00ffff;
+}
+
+.hologram-puck {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 30px;
+    background: radial-gradient(ellipse at center, #333 0%, #111 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 15px 5px rgba(20, 184, 166, 0.3);
+}
+.hologram-puck::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: #14b8a6;
+    border-radius: 50%;
+    box-shadow: 0 0 10px 2px #14b8a6;
+    animation: hologramPulse 2s infinite;
+}
+
+@keyframes hologramPulse {
+    0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 10px 2px #14b8a6; }
+    50% { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 20px 5px #14b8a6; }
+    100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 10px 2px #14b8a6; }
+}
+
+@media (max-width: 768px) {
+    .hologram-container {
+        width: 90vw;
+        max-width: 350px;
+        height: auto;
+        aspect-ratio: 350 / 400;
+    }
+
+    .hologram-projection h3 {
+        font-size: clamp(1.2rem, 5vw, 1.8rem);
+    }
+    
+    .hologram-projection li {
+        font-size: clamp(0.8rem, 3vw, 1rem);
+    }
+}
+    
+/* Cosmic Journey Styles */
+.cosmic-journey-content {
+    position: relative;
+    z-index: 2;
+}
+
+.cosmic-journey-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+}
+
+.cosmic-info {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #14b8a6;
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 2rem 0;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 30px rgba(20, 184, 166, 0.2);
+    max-width: 600px;
+}
+
+.cosmic-journey-station {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align station info to the right */
+    padding: 4rem 10%;
+    position: relative;
+}
+
+.station-info {
+    background: rgba(26, 26, 46, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(20, 184, 166, 0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(20, 184, 166, 0.2);
+    border-left: 4px solid #cd7f32;
+    text-align: left;
+}
+
+.station-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    color: #14b8a6;
+    filter: drop-shadow(0 0 8px #14b8a6);
+}
+
+
+/* Space Scene */
+.space-scene {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.spacecraft {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    z-index: 3;
+    transition: transform 0.5s ease-out;
+    visibility: hidden;
+}
+
+.spacecraft svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 15px #14b8a6);
+}
+
+.exhaust {
+    position: absolute;
+    bottom: -30px; 
+    left: 50%;
+    transform: translateX(-50%) scaleX(0.7);
+    transform-origin: top;
+    width: 20px;
+    height: 40px;
+    background: linear-gradient(0deg, #ff6b6b 0%, #ffa500 50%, transparent 100%);
+    border-radius: 0 0 20px 20px;
+    opacity: 0.8;
+    animation: flicker 0.1s infinite alternate;
+}
+
+
+@keyframes flicker {
+    0% { transform: translateX(-50%) scale(0.8, 1); }
+    100% { transform: translateX(-50%) scale(1.2, 1); }
+}
+
+.progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #cd7f32, #14b8a6);
+    z-index: 10;
+    transform-origin: left;
+    transform: scaleX(0);
+}
+
+@media (max-width: 768px) {
+    .cosmic-journey-section h2 { font-size: 2rem; }
+    .cosmic-journey-section p { font-size: 1rem; }
+    .spacecraft { width: 80px; height: 80px; }
+    .cosmic-journey-station { justify-content: center; text-align: center; }
+    .station-info { text-align: center; }
+}
+
+#smooth-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+#smooth-content {
+    overflow: visible;
+    width: 100%;
+}
+
