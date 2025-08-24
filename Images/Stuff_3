@@ -1,0 +1,194 @@
+'use client';
+
+import React, { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Rocket, Binary, Orbit, Atom, Bot, TestTube, Milestone, Building2 } from 'lucide-react';
+
+const CosmicJourney = () => {
+    const journeyRef = useRef(null);
+    const hasAnimated = useRef(false);
+
+    useEffect(() => {
+        if (hasAnimated.current) return;
+        
+        gsap.registerPlugin(ScrollTrigger);
+
+        const journeyElement = journeyRef.current;
+        if (!journeyElement) return;
+
+        // Generate stars
+        const starsContainer = journeyElement.querySelector('.stars-container');
+        if (starsContainer) {
+            const starCount = 150;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'particle';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                star.style.transform = `scale(${Math.random() * 1.5 + 0.5})`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        const journeyContent = document.querySelector(".cosmic-journey-content") as HTMLElement;
+
+        const spacecraftTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: journeyContent,
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1.5,
+                onUpdate: (self) => {
+                    gsap.to(".progress-bar", {
+                        scaleX: self.progress,
+                        duration: 0.1
+                    });
+                }
+            }
+        });
+        
+        // Pin the spacecraft and animate its journey
+        spacecraftTl
+            .fromTo(".spacecraft", 
+                { 
+                    top: "50%", 
+                    left: () => -journeyContent.offsetWidth * 0.2, // Start off-screen left
+                    autoAlpha: 0 
+                },
+                { 
+                    left: "10%", 
+                    autoAlpha: 1,
+                    duration: 10, 
+                    ease: "power1.inOut" 
+                }
+            )
+            .to(".spacecraft", {
+                 y: () => journeyContent.offsetHeight - window.innerHeight/2,
+                 ease: "none"
+            }, 0)
+            .to(".spacecraft", { 
+                left: () => journeyContent.offsetWidth + 200, // End off-screen right
+                duration: 10, 
+                ease: "power1.in" 
+            }, ">-10");
+
+
+        gsap.utils.toArray<HTMLElement>('.cosmic-journey-station').forEach((station, index) => {
+            const stationInfo = station.querySelector('.station-info');
+            gsap.fromTo(stationInfo,
+                { opacity: 0, x: -100 },
+                {
+                    opacity: 1, x: 0, duration: 1,
+                    scrollTrigger: {
+                        trigger: station,
+                        start: "top center",
+                        end: "center center",
+                        toggleActions: "play reverse play reverse"
+                    }
+                }
+            );
+
+            // Make rocket seem to interact with station
+            ScrollTrigger.create({
+                trigger: station,
+                start: 'top center',
+                end: 'bottom center',
+                onEnter: () => gsap.to('.spacecraft .exhaust', { scaleX: 0.5, opacity: 0.6, duration: 0.3 }),
+                onLeaveBack: () => gsap.to('.spacecraft .exhaust', { scaleX: 0.5, opacity: 0.6, duration: 0.3 }),
+                onEnterBack: () => gsap.to('.spacecraft .exhaust', { scaleX: 1, opacity: 0.8, duration: 0.3 }),
+                onLeave: () => gsap.to('.spacecraft .exhaust', { scaleX: 1, opacity: 0.8, duration: 0.3 }),
+            });
+        });
+
+        hasAnimated.current = true;
+        
+        return () => {
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        };
+    }, []);
+
+    const experiences = [
+      {
+        icon: Rocket,
+        title: 'Research Member - Formula Electric NED',
+        description: 'Conducted comprehensive research on E-Formula cars and SAE racing vehicles, focusing on technical design and performance optimization.'
+      },
+      {
+        icon: Building2,
+        title: 'Electronics Intern - NESPAK',
+        description: 'Gained expertise in surveillance systems, fire alarm systems, and telecommunications. Explored engineering consultancy and reverse engineering.'
+      },
+      {
+        icon: Bot,
+        title: 'Robotics Intern - NCAI Smart City Lab',
+        description: 'Restored and enhanced rover functionality for ROS-based autonomous systems. Developed control mechanisms and explored reinforcement learning.'
+      },
+      {
+        icon: TestTube,
+        title: 'Freelance Voiceover Artist',
+        description: 'Completed several paid voiceover projects, delivering high-quality audio recordings for a range of media before starting university.'
+      },
+      {
+        icon: Atom,
+        title: 'Social Media Director - ORYZOR NED',
+        description: 'Led social media strategy and content creation, managing promotional campaigns and enhancing community engagement through creative digital content.'
+      },
+      {
+        icon: Milestone,
+        title: 'Freelance Social Media Manager',
+        description: 'Managed social media accounts and created engaging video content for various clients on a part-time basis while pursuing university studies.'
+      },
+    ]
+
+    return (
+        <div ref={journeyRef}>
+            <div className="progress-bar"></div>
+            <div className="space-scene">
+                <div className="stars-container"></div>
+                <div className="spacecraft">
+                     <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 0 L65 25 L60 25 L60 55 L75 75 L75 95 L65 100 L35 100 L25 95 L25 75 L40 55 L40 25 L35 25 Z" fill="#e0e0e0"/>
+                        <path d="M50 0 L55 25 L45 25 Z" fill="#a0a0a0"/>
+                        <path d="M60 55 L70 70 L75 75 L75 95 L70 98 L65 100 L60 95 Z" fill="#c0c0c0"/>
+                        <path d="M40 55 L30 70 L25 75 L25 95 L30 98 L35 100 L40 95 Z" fill="#c0c0c0"/>
+                        <circle cx="50" cy="40" r="8" fill="#14b8a6" stroke="#0d9488" strokeWidth="2"/>
+                    </svg>
+                    <div className="exhaust"></div>
+                </div>
+            </div>
+            
+            <div className="cosmic-journey-content">
+                <section className="cosmic-journey-section h-[100vh] flex items-center justify-center">
+                     <div className="text-center">
+                        <h2 className="text-3xl md:text-5xl font-bold">My Professional Journey</h2>
+                        <p className="max-w-2xl mx-auto mt-4 text-lg">Embark on a voyage through my experiences, from academic research to hands-on industry internships. Scroll down to launch.</p>
+                     </div>
+                </section>
+
+                {experiences.map((exp, index) => {
+                  const Icon = exp.icon;
+                  return (
+                    <section key={index} className="cosmic-journey-station">
+                        <div className="station-info">
+                            <span className="station-icon"><Icon /></span>
+                            <h3 className="text-xl font-bold text-teal-300 mb-2">{exp.title}</h3>
+                            <p className="text-gray-400">{exp.description}</p>
+                        </div>
+                    </section>
+                  )
+                })}
+                
+                <section className="cosmic-journey-section h-[100vh] flex items-center justify-center">
+                    <div className="cosmic-info text-center">
+                        <h2 className="text-2xl md:text-4xl">The Infinite Beyond</h2>
+                        <p>This journey through past experiences is just the beginning. I am constantly seeking new challenges and opportunities to learn, grow, and contribute to the future of technology.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    );
+};
+
+export default CosmicJourney;
